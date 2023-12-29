@@ -46,6 +46,14 @@ public:
         dimensiones = valores.size();
         clusterId = 0;
     }
+    Point(double i, double j)
+    {
+        Id = 0;
+        valores.push_back(i);
+        valores.push_back(j);
+        dimensiones = valores.size();
+        clusterId = 0;
+    }
 
     int getDimensions()
     { 
@@ -57,14 +65,14 @@ public:
         return clusterId;
     }
 
+    void setCluster(int i)
+    {
+        clusterId = i;
+    }
+
     int getID()
     {
         return Id;
-    }
-
-    void setCluster(int valor)
-    {
-        clusterId = valor;
     }
 
     double getVal(int i)

@@ -1,15 +1,19 @@
+#ifndef _KD_TREE_H_
+
 #include <iostream>
 #include <vector>
 #include <limits>
 #include <cmath>
 #include <algorithm>
 
+#include "Point.h"
+
 // Definición de un punto en el espacio k-dimensional
-struct Point {
+/*struct Point {
     std::vector<double> coordinates;
 
-    Point(const std::vector<double>& coords) : coordinates(coords) {}
-};
+    Point( std::vector<double>& coords) : coordinates(coords) {}
+};*/
 
 // Definición de un nodo en el árbol k-d
 struct KDNode {
@@ -17,7 +21,7 @@ struct KDNode {
     KDNode* left;
     KDNode* right;
 
-    KDNode(const Point& p) : point(p), left(nullptr), right(nullptr) {}
+    KDNode(Point& p) : point(p), left(nullptr), right(nullptr) {}
 };
 
 class KDTree {
@@ -26,27 +30,27 @@ public:
     KDTree() : root(nullptr) {}
 
     // Función para insertar un punto en el árbol k-d
-    void insert(const Point& point) {
+    void insert(Point& point) {
         root = insertRecursive(root, point, 0);
     }
 
     // Función para buscar el punto más cercano en el árbol k-d
-    Point findNearestNeighbor(const Point& target) const {
+    Point findNearestNeighbor(Point& target)  {
         double bestDistance = std::numeric_limits<double>::max();
         return findNearestNeighborRecursive(root, target, 0, bestDistance);
     }
 
 private:
     // Función recursiva para insertar un punto en el árbol k-d
-    KDNode* insertRecursive(KDNode* node, const Point& point, size_t depth) {
+    KDNode* insertRecursive(KDNode* node, Point& point, size_t depth) {
         if (!node) {
             return new KDNode(point);
         }
 
-        size_t k = point.coordinates.size();
+        size_t k = point.getDimensions();
         size_t axis = depth % k;
 
-        if (point.coordinates[axis] < node->point.coordinates[axis]) {
+        if (point.getVal(axis) < node->point.getVal(axis)) {
             node->left = insertRecursive(node->left, point, depth + 1);
         } else {
             node->right = insertRecursive(node->right, point, depth + 1);
@@ -56,16 +60,16 @@ private:
     }
 
     // Función recursiva para buscar el punto más cercano en el árbol k-d
-    Point findNearestNeighborRecursive(const KDNode* node, const Point& target, size_t depth, double& bestDistance) const {
+    Point findNearestNeighborRecursive(KDNode* node, Point& target, size_t depth, double& bestDistance)  {
         if (!node) {
             return Point({std::numeric_limits<double>::max(),std::numeric_limits<double>::max()}); // Punto vacío si el árbol está vacío
         }
 
-        size_t k = target.coordinates.size();
+        size_t k = target.getDimensions();
         size_t axis = depth % k;
 
-        const KDNode* nextBranch = (target.coordinates[axis] < node->point.coordinates[axis]) ? node->left : node->right;
-        const KDNode* otherBranch = (nextBranch == node->left) ? node->right : node->left;
+        KDNode* nextBranch = (target.getVal(axis) < node->point.getVal(axis)) ? node->left : node->right;
+        KDNode* otherBranch = (nextBranch == node->left) ? node->right : node->left;
 
         Point best = findNearestNeighborRecursive(nextBranch, target, depth + 1, bestDistance);
 
@@ -74,7 +78,7 @@ private:
             bestDistance = distanceSquared(target, best);
         }
 
-        if (std::abs(target.coordinates[axis] - node->point.coordinates[axis]) < std::sqrt(bestDistance)) {
+        if (std::abs(target.getVal(axis) - node->point.getVal(axis)) < std::sqrt(bestDistance)) {
             Point candidate = findNearestNeighborRecursive(otherBranch, target, depth + 1, bestDistance);
             if (distanceSquared(target, candidate) < bestDistance) {
                 best = candidate;
@@ -85,10 +89,10 @@ private:
     }
 
     // Función auxiliar para calcular la distancia euclidiana cuadrada entre dos puntos
-    double distanceSquared(const Point& p1, const Point& p2) const {
+    double distanceSquared(Point& p1,Point& p2)  {
         double distance = 0.0;
-        for (size_t i = 0; i < p1.coordinates.size(); ++i) {
-            double diff = p1.coordinates[i] - p2.coordinates[i];
+        for (size_t i = 0; i < p1.getDimensions(); ++i) {
+            double diff = p1.getVal(i) - p2.getVal(i);
             distance += diff * diff;
         }
         
@@ -98,25 +102,35 @@ private:
 
     KDNode* root;
 };
-
+/*
 int main() {
     // Ejemplo de uso
     KDTree kdTree;
 
+    Point A(2, 3);
+    Point B(5, 4);
+    Point C(9, 6);
+    Point D(4, 7);
+    Point E(8, 1);
+    Point F(7, 2);
+
     // Insertar puntos en el árbol
-    kdTree.insert(Point({2, 3}));
-    kdTree.insert(Point({5, 4}));
-    kdTree.insert(Point({9, 6}));
-    kdTree.insert(Point({4, 7}));
-    kdTree.insert(Point({8, 1}));
-    kdTree.insert(Point({7, 2}));
+    kdTree.insert(A);
+    kdTree.insert(B);
+    kdTree.insert(C);
+    kdTree.insert(D);
+    kdTree.insert(E);
+    kdTree.insert(F);
 
     // Buscar el punto más cercano al punto (6, 5)
     Point target({6, 5});
     Point nearestNeighbor = kdTree.findNearestNeighbor(target);
 
     // Imprimir el resultado
-    std::cout << "Punto más cercano a (" << target.coordinates[0] << ", " << target.coordinates[1] << "): ("<< nearestNeighbor.coordinates[0] << ", " << nearestNeighbor.coordinates[1] << ")\n";
+    std::cout << "Punto más cercano a (" << target.getVal(0) << ", " << target.getVal(1) << "): ("<< nearestNeighbor.getVal(0) << ", " << nearestNeighbor.getVal(1) << ")\n";
 
     return 0;
 }
+*/
+
+#endif

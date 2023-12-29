@@ -1,6 +1,6 @@
 #ifndef _CLUSTER_H_
 
-#include "Point.h"
+#include "Kd_tree.h"
 
 class Cluster
 {
